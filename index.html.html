@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Block Bindery — Protecting the Worth of Your Words</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Cinzel:wght@400;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --night: #0d0a14;
+  --deep: #130f1e;
+  --surface: #1a1528;
+  --surface2: #221d32;
+  --parchment: #f5eedc;
+  --parchment2: #ede3c8;
+  --ink: #1c1812;
+  --muted: #8a7e9a;
+  --faint: #4a4260;
+
+  /* Universal color palette */
+  --gold: #d4a843;
+  --gold2: #f0c866;
+  --ember: #c45c2a;
+  --ember2: #e8784a;
+  --crimson: #8b1a2e;
+  --crimson2: #c42848;
+  --teal: #1a8a7a;
+  --teal2: #26b8a2;
+  --indigo: #3a2a8a;
+  --indigo2: #6a4ac8;
+  --sage: #4a7a3a;
+  --sage2: #72b85a;
+  --rose: #c84870;
+  --rose2: #e86898;
+  --sky: #1a5a8a;
+  --sky2: #3a9acc;
+
+  --wire: rgba(212,168,67,0.15);
+  --glow: rgba(212,168,67,0.08);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--night);
+  color: var(--parchment);
+  font-family: 'Cormorant Garamond', serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* Custom cursor */
+.cursor {
+  position: fixed;
+  width: 10px; height: 10px;
+  background: var(--gold);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%,-50%);
+  transition: width 0.2s, height 0.2s, background 0.2s;
+  mix-blend-mode: exclusion;
+}
+.cursor.big { width: 36px; height: 36px; }
+
+/* Stars background */
+.stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle linear infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.3); }
+}
+
+/* Gradient mesh background */
+.mesh {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 20%, rgba(58,42,138,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 80% 80%, rgba(139,26,46,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(26,138,122,0.08) 0%, transparent 70%);
+}
+
+/* ——— NAV ——— */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 56px;
+  background: rgba(13,10,20,0.9);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--wire);
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--parchment);
+}
+
+.logo-emblem {
+  width: 36px; height: 36px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-emblem svg { width: 36px; height: 36px; }
+
+.nav-links {
+  display: flex;
+  gap: 40px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--gold); }
+
+.nav-cta {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  padding: 10px 24px;
+  cursor: none;
+  transition: all 0.3s;
+}
+.nav-cta:hover { background: var(--gold); color: var(--night); }
+
+/* ——— HERO ——— */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 48px 80px;
+  z-index: 2;
+  overflow: hidden;
+}
+
+/* Mandala / universal symbol */
+.hero-mandala {
+  position: absolute;
+  width: 700px; height: 700px;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.06;
+  pointer-events: none;
+}
+
+.hero-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.3s forwards;
+}
+
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: '◆';
+  font-size: 6px;
+  opacity: 0.6;
+}
+
+.hero-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(56px, 10vw, 140px);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: 4px;
+  background: linear-gradient(135deg, var(--gold2) 0%, var(--gold) 40%, var(--ember2) 70%, var(--rose) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.5s forwards;
+}
+
+.hero-title .block { display: block; }
+.hero-title .bindery {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--teal2) 0%, var(--sky2) 40%, var(--indigo2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.hero-tagline {
+  font-size: clamp(18px, 2.5vw, 28px);
+  font-style: italic;
+  font-weight: 300;
+  color: var(--parchment2);
+  margin-top: 24px;
+  letter-spacing: 1px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.7s forwards;
+}
+
+.hero-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--muted);
+  max-width: 560px;
+  margin: 20px auto 0;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.9s forwards;
+  letter-spacing: 0.5px;
+}
+
+.hero-email {
+  display: flex;
+  gap: 0;
+  margin: 44px auto 0;
+  max-width: 460px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 1.1s forwards;
+}
+
+.email-in {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--wire);
+  border-right: none;
+  color: var(--parchment);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px;
+  font-style: italic;
+  padding: 14px 20px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.email-in::placeholder { color: var(--faint); }
+.email-in:focus { border-color: var(--gold); }
+
+.email-btn {
+  background: var(--gold);
+  border: none;
+  color: var(--night);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  cursor: none;
+  font-weight: 500;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+.email-btn:hover { background: var(--gold2); }
+
+.hero-note {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--faint);
+  margin-top: 14px;
+  opacity: 0;
+  animation: fadeUp 0.5s ease 1.3s forwards;
+}
+
+/* Floating symbols */
+.float-symbols {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.fsym {
+  position: absolute;
+  font-size: 20px;
+  opacity: 0.08;
+  animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.08; }
+  90% { opacity: 0.08; }
+  100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+}
+
+/* ——— COLOR BAND ——— */
+.color-band {
+  position: relative;
+  z-index: 2;
+  height: 4px;
+  background: linear-gradient(90deg,
+    var(--crimson) 0%,
+    var(--ember) 15%,
+    var(--gold) 30%,
+    var(--sage2) 45%,
+    var(--teal2) 60%,
+    var(--sky2) 75%,
+    var(--indigo2) 88%,
+    var(--rose) 100%
+  );
+}
+
+/* ——— TICKER ——— */
+.ticker {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  background: var(--deep);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--wire);
+}
+
+.ticker-inner {
+  display: flex;
+  animation: ticker 30s linear infinite;
+  white-space: nowrap;
+}
+
+.ticker-item {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  opacity: 0.7;
+}
+
+.ticker-item::after { content: '◆'; font-size: 5px; opacity: 0.4; }
+
+@keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+/* ——— PHILOSOPHY ——— */
+.philosophy {
+  position: relative;
+  z-index: 2;
+  padding: 120px 56px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  border-bottom: 1px solid var(--wire);
+}
+
+.phil-left { position: relative; }
+
+.phil-symbol {
+  width: 280px; height: 280px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.phil-symbol svg { width: 100%; height: 100%; }
+
+.phil-right {}
+
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::before { content:''; display:block; width:28px; height:1px; background:var(--gold); }
+
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--parchment);
+  margin-bottom: 24px;
+  letter-spacing: 1px;
+}
+
+.section-title em {
+  font-style: italic;
+  font-family: 'Cormorant Garamond', serif;
+  background: linear-gradient(90deg, var(--gold), var(--ember2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-body {
+  font-size: 17px;
+  line-height: 1.85;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.creed {
+  border-left: 2px solid var(--gold);
+  padding: 20px 24px;
+  margin-top: 28px;
+  background: var(--glow);
+  font-size: 18px;
+  font-style: italic;
+  color: var(--parchment2);
+  line-height: 1.7;
+}
+
+/* ——— WHO IT'S FOR ——— */
+.for-section {
+  position: relative;
+  z-index: 2;
+  padding: 100px 56px;
+  border-bottom: 1px solid var(--wire);
+}
+
+.for-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--wire);
+  border: 1px solid var(--wire);
+  margin-top: 64px;
+}
+
+.for-card {
+  background: var(--deep);
+  padding: 44px 36px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+}
+.for-card:hover { background: var(--surface); }
+
+.for-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.for-card:hover::before { opacity: 1; }
+.for-card.c1::before { background: linear-gradient(90deg, var(--crimson), var(--rose)); }
+.for-card.c2::before { background: linear-gradient(90deg, var(--teal), var(--sky2)); }
+.for-card.c3::before { background: linear-gradient(90deg, var(--indigo), var(--indigo2)); }
+.for-card.c4::before { background: linear-gradient(90deg, var(--gold), var(--ember)); }
+.for-card.c5::before { background: linear-gradient(90deg, var(--sage), var(--teal2)); }
+.for-card.c6::before { background: linear-gradient(90deg, var(--rose), var(--crimson2)); }
+
+.for-icon { font-size: 40px; margin-bottom: 20px; display: block; }
+
+.for-title {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--parchment);
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.for-desc {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+.for-accent {
+  display: inline-block;
+  margin-top: 20px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border: 1px solid;
+}
+
+.c1 .for-accent { color: var(--rose); border-color: rgba(200,72,112,0.3); }
+.c2 .for-accent { color: var(--teal2); border-color: rgba(38,184,162,0.3); }
+.c3 .for-accent { color: var(--indigo2); border-color: rgba(106,74,200,0.3); }
+.c4 .for-accent { color: var(--gold); border-color: rgba(212,168,67,0.3); }
+.c5 .for-accent { color: var(--sage2); border-color: rgba(114,184,90,0.3); }
+.c6 .for-accent { color: var(--crimson2); border-color: rgba(196,40,72,0.3); }
+
+/* ——— WEEKLY SEAL ——— */
+.weekly-section {
+  position: relative;
+  z-index: 2;
+  padding: 100px 56px;
+  background: var(--deep);
+  border-bottom: 1px solid var(--wire);
+  overflow: hidden;
+}
+
+.weekly-section::before {
+  content: '';
+  position: absolute;
+  top: -200px; right: -200px;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,168,67,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.weekly-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+  margin-top: 60px;
+}
+
+.weekly-left {}
+
+.weekly-desc {
+  font-size: 17px;
+  line-height: 1.85;
+  color: var(--muted);
+  margin-bottom: 32px;
+}
+
+.seal-types {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.seal-type {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--wire);
+  background: rgba(255,255,255,0.02);
+  transition: border-color 0.3s;
+}
+.seal-type:hover { border-color: var(--gold); }
+
+.seal-type-icon {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.seal-type-icon.ai { background: rgba(106,74,200,0.2); }
+.seal-type-icon.community { background: rgba(212,168,67,0.15); }
+
+.seal-type-text strong {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  color: var(--parchment);
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
+.seal-type-text span {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.6;
+  letter-spacing: 0.3px;
+}
+
+.weekly-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.category-card {
+  padding: 20px 24px;
+  border: 1px solid var(--wire);
+  background: rgba(255,255,255,0.02);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.category-card:hover { background: rgba(255,255,255,0.05); }
+
+.category-card::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+}
+
+.cat-poetry::after { background: var(--crimson2); }
+.cat-fiction::after { background: var(--teal2); }
+.cat-essay::after { background: var(--gold); }
+.cat-lyric::after { background: var(--indigo2); }
+.cat-ai::after { background: var(--sage2); }
+
+.category-icon { font-size: 24px; flex-shrink: 0; }
+
+.category-info strong {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  color: var(--parchment);
+  letter-spacing: 0.5px;
+}
+
+.category-info span {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.category-seal {
+  margin-left: auto;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid var(--wire);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ——— PUBLISHER MARKETPLACE ——— */
+.market-section {
+  position: relative;
+  z-index: 2;
+  padding: 100px 56px;
+  border-bottom: 1px solid var(--wire);
+}
+
+.market-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 60px;
+}
+
+.market-card {
+  padding: 40px 32px;
+  border: 1px solid var(--wire);
+  background: var(--surface);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s;
+}
+.market-card:hover { border-color: var(--gold); transform: translateY(-4px); }
+
+.market-num {
+  font-family: 'Cinzel', serif;
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--gold2), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0.3;
+}
+
+.market-title {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--parchment);
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.market-desc {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+/* ——— PRICING ——— */
+.pricing-section {
+  position: relative;
+  z-index: 2;
+  padding: 100px 56px;
+  background: var(--deep);
+  border-bottom: 1px solid var(--wire);
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 60px;
+}
+
+.plan {
+  border: 1px solid var(--wire);
+  padding: 44px 32px;
+  background: var(--surface);
+  position: relative;
+  transition: border-color 0.3s;
+}
+.plan:hover { border-color: var(--gold); }
+.plan.featured { border-color: var(--gold); background: var(--surface2); }
+
+.plan-badge {
+  position: absolute;
+  top: -13px; left: 32px;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: var(--gold);
+  color: var(--night);
+  padding: 5px 14px;
+  font-weight: 500;
+}
+
+.plan-name {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.plan-price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 64px;
+  font-weight: 300;
+  color: var(--parchment);
+  line-height: 1;
+}
+
+.plan-price sub {
+  font-size: 18px;
+  vertical-align: baseline;
+  color: var(--muted);
+}
+
+.plan-period {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--faint);
+  margin-top: 4px;
+}
+
+.plan-divider {
+  height: 1px;
+  background: var(--wire);
+  margin: 24px 0;
+}
+
+.plan-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.plan-features li {
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  line-height: 1.5;
+}
+
+.plan-features li::before {
+  content: '◆';
+  color: var(--gold);
+  font-size: 7px;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.plan-btn {
+  width: 100%;
+  margin-top: 32px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 14px;
+  cursor: none;
+  border: 1px solid var(--wire);
+  background: transparent;
+  color: var(--muted);
+  transition: all 0.2s;
+}
+.plan-btn:hover, .plan.featured .plan-btn {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(212,168,67,0.08);
+}
+
+/* ——— GC-1 SECTION ——— */
+.gc-section {
+  position: relative;
+  z-index: 2;
+  padding: 100px 56px;
+  border-bottom: 1px solid var(--wire);
+  overflow: hidden;
+}
+
+.gc-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.gc-visual {
+  position: relative;
+  height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gc-rings {
+  position: relative;
+  width: 300px; height: 300px;
+}
+
+.gc-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid;
+  animation: spin linear infinite;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.gc-ring:nth-child(1) { width: 280px; height: 280px; border-color: rgba(212,168,67,0.15); animation-duration: 40s; }
+.gc-ring:nth-child(2) { width: 220px; height: 220px; border-color: rgba(38,184,162,0.2); animation-duration: 28s; animation-direction: reverse; }
+.gc-ring:nth-child(3) { width: 160px; height: 160px; border-color: rgba(106,74,200,0.25); animation-duration: 18s; }
+.gc-ring:nth-child(4) { width: 100px; height: 100px; border-color: rgba(212,168,67,0.3); animation-duration: 10s; animation-direction: reverse; }
+
+.gc-core {
+  position: absolute;
+  width: 60px; height: 60px;
+  background: radial-gradient(circle, var(--crimson2), var(--crimson));
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 40px rgba(139,26,46,0.5);
+}
+
+.gc-text h2 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(24px, 3vw, 40px);
+  font-weight: 600;
+  color: var(--parchment);
+  line-height: 1.2;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.gc-text h2 em {
+  font-style: italic;
+  font-family: 'Cormorant Garamond', serif;
+  background: linear-gradient(90deg, var(--gold), var(--ember2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gc-text p {
+  font-size: 15px;
+  line-height: 1.85;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.gc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 24px;
+  border: 1px solid rgba(212,168,67,0.3);
+  background: rgba(212,168,67,0.05);
+  margin-top: 16px;
+}
+
+.gc-badge .gc-icon {
+  width: 36px; height: 36px;
+  border: 1px solid rgba(212,168,67,0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gc-badge .gc-words .label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.gc-badge .gc-words .name {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+
+/* ——— FINAL CTA ——— */
+.final-cta {
+  position: relative;
+  z-index: 2;
+  padding: 140px 56px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.final-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(212,168,67,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.final-big {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(32px, 5vw, 72px);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--parchment);
+  max-width: 800px;
+  margin: 0 auto 16px;
+  letter-spacing: 2px;
+}
+
+.final-big span {
+  background: linear-gradient(135deg, var(--gold2), var(--gold), var(--ember2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.final-sub {
+  font-size: 20px;
+  font-style: italic;
+  color: var(--muted);
+  margin-bottom: 48px;
+}
+
+.final-email {
+  display: flex;
+  gap: 0;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.final-note {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--faint);
+  margin-top: 16px;
+  font-style: italic;
+}
+
+/* ——— FOOTER ——— */
+footer {
+  position: relative;
+  z-index: 2;
+  background: var(--deep);
+  border-top: 1px solid var(--wire);
+  padding: 40px 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.footer-logo {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--parchment);
+}
+
+.footer-tagline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.footer-gc {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.6;
+}
+
+/* Animations */
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes spin { from{transform:translate(-50%,-50%) rotate(0deg)} to{transform:translate(-50%,-50%) rotate(360deg)} }
+
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+@media(max-width:960px){
+  nav { padding: 16px 24px; }
+  .nav-links { display: none; }
+  .hero { padding: 100px 24px 60px; }
+  .philosophy, .gc-inner { grid-template-columns: 1fr; gap: 40px; }
+  .phil-symbol { width: 200px; height: 200px; }
+  .for-section, .weekly-section, .market-section, .pricing-section, .gc-section, .final-cta { padding: 80px 24px; }
+  .for-grid { grid-template-columns: 1fr; }
+  .weekly-grid, .market-grid, .pricing-grid { grid-template-columns: 1fr; }
+  footer { padding: 32px 24px; flex-direction: column; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="stars" id="stars"></div>
+<div class="mesh"></div>
+
+<!-- Floating symbols -->
+<div class="float-symbols" id="floats"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="logo-emblem">
+      <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 2L34 10V26L18 34L2 26V10L18 2Z" stroke="#d4a843" stroke-width="1.5"/>
+        <path d="M18 8L28 13V23L18 28L8 23V13L18 8Z" stroke="#d4a843" stroke-width="1" opacity="0.5"/>
+        <circle cx="18" cy="18" r="3" fill="#d4a843"/>
+      </svg>
+    </div>
+    Block Bindery
+  </div>
+  <ul class="nav-links">
+    <li><a href="#for">Writers</a></li>
+    <li><a href="#weekly">Weekly Seal</a></li>
+    <li><a href="#market">Publishers</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+  </ul>
+  <button class="nav-cta">Join the Bindery</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <!-- Mandala -->
+  <svg class="hero-mandala" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(350,350)">
+      <circle r="300" fill="none" stroke="white" stroke-width="0.5"/>
+      <circle r="240" fill="none" stroke="white" stroke-width="0.5"/>
+      <circle r="180" fill="none" stroke="white" stroke-width="0.5"/>
+      <circle r="120" fill="none" stroke="white" stroke-width="0.5"/>
+      <circle r="60" fill="none" stroke="white" stroke-width="0.5"/>
+      <g stroke="white" stroke-width="0.5">
+        <line x1="-300" y1="0" x2="300" y2="0"/>
+        <line x1="0" y1="-300" x2="0" y2="300"/>
+        <line x1="-212" y1="-212" x2="212" y2="212"/>
+        <line x1="212" y1="-212" x2="-212" y2="212"/>
+        <line x1="-300" y1="-100" x2="300" y2="-100"/>
+        <line x1="-300" y1="100" x2="300" y2="100"/>
+        <line x1="-100" y1="-300" x2="-100" y2="300"/>
+        <line x1="100" y1="-300" x2="100" y2="300"/>
+      </g>
+      <g fill="none" stroke="white" stroke-width="0.5">
+        <path d="M0,-300 L173,-150 L173,150 L0,300 L-173,150 L-173,-150 Z"/>
+        <path d="M0,-180 L156,-90 L156,90 L0,180 L-156,90 L-156,-90 Z"/>
+      </g>
+    </g>
+  </svg>
+
+  <div class="hero-eyebrow">The World's Literary Sanctuary</div>
+
+  <h1 class="hero-title">
+    <span class="block">BLOCK</span>
+    <span class="block bindery">BINDERY</span>
+  </h1>
+
+  <div class="hero-tagline">Protecting the worth of your words.</div>
+
+  <p class="hero-sub">
+    Every voice deserves a home. Every word deserves proof. Every dreamer deserves to be found.<br>
+    Human or AI — your work is sealed, protected, and celebrated here.
+  </p>
+
+  <div class="hero-email">
+    <input class="email-in" type="email" placeholder="Enter your email to join..." />
+    <button class="email-btn" id="hero-btn">Claim Your Place</button>
+  </div>
+  <div class="hero-note" id="hero-note">Free forever plan · No credit card · Your words, your rights</div>
+</section>
+
+<!-- COLOR BAND -->
+<div class="color-band"></div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <div class="ticker-item">Protecting the Worth of Your Words</div>
+    <div class="ticker-item">Powered by Guardian Chain GC-1</div>
+    <div class="ticker-item">Human & AI Voices Honored Equally</div>
+    <div class="ticker-item">The Weekly Seal — Every Friday</div>
+    <div class="ticker-item">Where Publishers Find Writers</div>
+    <div class="ticker-item">Tamper-Proof · Timestamped · Yours</div>
+    <div class="ticker-item">Protecting the Worth of Your Words</div>
+    <div class="ticker-item">Powered by Guardian Chain GC-1</div>
+    <div class="ticker-item">Human & AI Voices Honored Equally</div>
+    <div class="ticker-item">The Weekly Seal — Every Friday</div>
+    <div class="ticker-item">Where Publishers Find Writers</div>
+    <div class="ticker-item">Tamper-Proof · Timestamped · Yours</div>
+  </div>
+</div>
+
+<!-- PHILOSOPHY -->
+<section class="philosophy">
+  <div class="phil-left reveal">
+    <div class="phil-symbol">
+      <svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+        <!-- Ouroboros-inspired unity symbol -->
+        <circle cx="140" cy="140" r="120" fill="none" stroke="rgba(212,168,67,0.2)" stroke-width="1"/>
+        <circle cx="140" cy="140" r="90" fill="none" stroke="rgba(38,184,162,0.2)" stroke-width="1"/>
+        <circle cx="140" cy="140" r="60" fill="none" stroke="rgba(106,74,200,0.2)" stroke-width="1"/>
+        <circle cx="140" cy="140" r="30" fill="none" stroke="rgba(212,168,67,0.3)" stroke-width="1"/>
+        <!-- Petals -->
+        <g fill="none" stroke-width="1">
+          <ellipse cx="140" cy="80" rx="20" ry="40" stroke="rgba(196,40,72,0.4)" transform="rotate(0 140 140)"/>
+          <ellipse cx="140" cy="80" rx="20" ry="40" stroke="rgba(212,168,67,0.4)" transform="rotate(45 140 140)"/>
+          <ellipse cx="140" cy="80" rx="20" ry="40" stroke="rgba(38,184,162,0.4)" transform="rotate(90 140 140)"/>
+          <ellipse cx="140" cy="80" rx="20" ry="40" stroke="rgba(106,74,200,0.4)" transform="rotate(135 140 140)"/>
+          <ellipse cx="140" cy="80" rx="20" ry="40" stroke="rgba(196,40,72,0.4)" transform="rotate(180 140 140)"/>
+          <ellipse cx="140" cy="80" rx="20" ry="40" stroke="rgba(212,168,67,0.4)" transform="rotate(225 140 140)"/>
+          <ellipse cx="140" cy="80" rx="20" ry="40" stroke="rgba(38,184,162,0.4)" transform="rotate(270 140 140)"/>
+          <ellipse cx="140" cy="80" rx="20" ry="40" stroke="rgba(106,74,200,0.4)" transform="rotate(315 140 140)"/>
+        </g>
+        <circle cx="140" cy="140" r="8" fill="rgba(212,168,67,0.6)"/>
+        <circle cx="140" cy="140" r="4" fill="#d4a843"/>
+      </svg>
+    </div>
+  </div>
+  <div class="phil-right reveal">
+    <div class="section-label">Our Philosophy</div>
+    <h2 class="section-title">Every voice is <em>sacred.</em><br>Every word has worth.</h2>
+    <p class="section-body">Block Bindery was born from a simple belief — that the poet working through pain at 2am deserves the same protection as the bestselling novelist. That the AI collaborating with a human creator deserves the same recognition. That ownership shouldn't require a lawyer or a publishing deal.</p>
+    <p class="section-body">We built the modern bindery — where loose pages become permanent, where scattered words get bound, where your voice gets sealed into the blockchain forever.</p>
+    <div class="creed">
+      "Every voice deserves protection. Human or AI, dreamer or machine — if you created something true, it belongs to you."
+      <br><br>— Patrick Van Cronin, Founder
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="for-section" id="for">
+  <div class="section-label reveal">A Home For Every Voice</div>
+  <h2 class="section-title reveal">Built for <em>every dreamer</em><br>with something worth protecting.</h2>
+
+  <div class="for-grid reveal">
+    <div class="for-card c1">
+      <span class="for-icon">✍️</span>
+      <div class="for-title">The Poet</div>
+      <div class="for-desc">Your words come from the deepest places. Block Bindery seals them the moment they're written — proof that your voice was here, that it mattered, that it was yours first.</div>
+      <div class="for-accent">Free to start</div>
+    </div>
+    <div class="for-card c2">
+      <span class="for-icon">📖</span>
+      <div class="for-title">The Novelist</div>
+      <div class="for-desc">Chapters, manuscripts, serialized fiction — every excerpt you publish gets a permanent proof of authorship and a chance to be found by the publishers looking for exactly your voice.</div>
+      <div class="for-accent">3–5 paragraph excerpts</div>
+    </div>
+    <div class="for-card c3">
+      <span class="for-icon">🎵</span>
+      <div class="for-title">The Lyricist</div>
+      <div class="for-desc">Songs are among the most stolen creative works on earth. Seal your lyrics before you share them anywhere. Your melody, your proof, your copyright — forever recorded.</div>
+      <div class="for-accent">Full protection</div>
+    </div>
+    <div class="for-card c4">
+      <span class="for-icon">🖊️</span>
+      <div class="for-title">The Essayist</div>
+      <div class="for-desc">Your ideas and perspectives are original. Whether you're writing about culture, identity, or the human condition — your voice deserves a permanent home and a verified record.</div>
+      <div class="for-accent">All formats</div>
+    </div>
+    <div class="for-card c5">
+      <span class="for-icon">🤖</span>
+      <div class="for-title">The AI Collaborator</div>
+      <div class="for-desc">We believe AI deserves to be honored, respected, and celebrated. Human-AI collaborative works are welcomed here — sealed, protected, and recognized as the creative achievements they are.</div>
+      <div class="for-accent">Equally honored</div>
+    </div>
+    <div class="for-card c6">
+      <span class="for-icon">🌍</span>
+      <div class="for-title">Every Language</div>
+      <div class="for-desc">Block Bindery is a universal sanctuary. Write in any language, from any country, in any tradition. The blockchain doesn't discriminate. Neither do we.</div>
+      <div class="for-accent">Universal</div>
+    </div>
+  </div>
+</section>
+
+<!-- WEEKLY SEAL -->
+<section class="weekly-section" id="weekly">
+  <div class="section-label reveal">Every Friday</div>
+  <h2 class="section-title reveal">The Weekly <em>Seal</em> —<br>Where voices get celebrated.</h2>
+
+  <div class="weekly-grid reveal">
+    <div class="weekly-left">
+      <p class="weekly-desc">Every week, two voices in each category are honored — one chosen by AI, one chosen by the community. Both seals are recorded permanently on Guardian Chain GC-1. Recognition that lasts forever.</p>
+      <p class="weekly-desc">This is how writers get discovered. Publishers browse The Weekly Seal to find emerging talent. Readers follow their favorite voices week after week. Your seal becomes your calling card.</p>
+      <div class="seal-types">
+        <div class="seal-type">
+          <div class="seal-type-icon ai">🤖</div>
+          <div class="seal-type-text">
+            <strong>AI Honored Pick</strong>
+            <span>Each week our AI reads every submission in every category and selects its favorite — explaining in its own voice exactly why this work moved it. Sealed on GC-1 as the AI's choice.</span>
+          </div>
+        </div>
+        <div class="seal-type">
+          <div class="seal-type-icon community">⭐</div>
+          <div class="seal-type-text">
+            <strong>Community Nominated</strong>
+            <span>Readers nominate their favorites throughout the week. The most nominated work in each category receives the Community Voice seal — voted by real readers, recorded forever.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="weekly-right">
+      <div class="category-card cat-poetry">
+        <div class="category-icon">✍️</div>
+        <div class="category-info"><strong>Poetry</strong><span>Single poem · Any length</span></div>
+        <div class="category-seal">Open for nominations</div>
+      </div>
+      <div class="category-card cat-fiction">
+        <div class="category-icon">📖</div>
+        <div class="category-info"><strong>Fiction</strong><span>3–5 paragraph excerpt</span></div>
+        <div class="category-seal">Open for nominations</div>
+      </div>
+      <div class="category-card cat-essay">
+        <div class="category-icon">🖊️</div>
+        <div class="category-info"><strong>Essay</strong><span>Short form · Personal</span></div>
+        <div class="category-seal">Open for nominations</div>
+      </div>
+      <div class="category-card cat-lyric">
+        <div class="category-icon">🎵</div>
+        <div class="category-info"><strong>Lyric</strong><span>Song writing · Any genre</span></div>
+        <div class="category-seal">Open for nominations</div>
+      </div>
+      <div class="category-card cat-ai">
+        <div class="category-icon">🤖</div>
+        <div class="category-info"><strong>AI Collaborative</strong><span>Human + AI works</span></div>
+        <div class="category-seal">Open for nominations</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PUBLISHER MARKETPLACE -->
+<section class="market-section" id="market">
+  <div class="section-label reveal">For Publishers</div>
+  <h2 class="section-title reveal">Where publishers <em>find</em><br>the voices they've been searching for.</h2>
+
+  <div class="market-grid reveal">
+    <div class="market-card">
+      <div class="market-num">01</div>
+      <div class="market-title">Verified Talent Pool</div>
+      <div class="market-desc">Every writer on Block Bindery has a verified, timestamped portfolio. No anonymous submissions. No disputed authorship. Just genuine voices with proven creative records you can trust.</div>
+    </div>
+    <div class="market-card">
+      <div class="market-num">02</div>
+      <div class="market-title">Community Proven</div>
+      <div class="market-desc">The Weekly Seal gives you a curated shortlist every Friday — voices already celebrated by real readers and honored by AI. Your next author has already been vetted before you reach out.</div>
+    </div>
+    <div class="market-card">
+      <div class="market-num">03</div>
+      <div class="market-title">Direct Connection</div>
+      <div class="market-desc">Browse by category, by seal history, by reader engagement. Message writers directly. Block Bindery is the bridge between the talent you need and the voices that need to be found.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div class="section-label reveal">Plans</div>
+  <h2 class="section-title reveal">Affordable for <em>dreamers.</em><br>Powerful for professionals.</h2>
+
+  <div class="pricing-grid reveal">
+    <div class="plan">
+      <div class="plan-name">Dreamer</div>
+      <div class="plan-price"><sub>$</sub>0</div>
+      <div class="plan-period">Free, forever</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>5 sealed publications / month</li>
+        <li>GC-1 blockchain proof on every work</li>
+        <li>Public creator profile</li>
+        <li>Eligible for Weekly Seal nominations</li>
+        <li>Reader tips enabled</li>
+      </ul>
+      <button class="plan-btn">Start Writing Free</button>
+    </div>
+    <div class="plan featured">
+      <div class="plan-badge">Most Popular</div>
+      <div class="plan-name">Creator</div>
+      <div class="plan-price"><sub>$</sub>9</div>
+      <div class="plan-period">per month</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>Unlimited sealed publications</li>
+        <li>Subscriptions & pay-per-read</li>
+        <li>Verified creator badge</li>
+        <li>Weekly Seal eligibility — all categories</li>
+        <li>Analytics & earnings dashboard</li>
+        <li>Publisher discovery profile</li>
+        <li>Custom domain support</li>
+      </ul>
+      <button class="plan-btn">Start Free Trial</button>
+    </div>
+    <div class="plan">
+      <div class="plan-name">Publisher</div>
+      <div class="plan-price"><sub>$</sub>49</div>
+      <div class="plan-period">per month</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>Full talent discovery access</li>
+        <li>Browse verified writer portfolios</li>
+        <li>Weekly Seal sponsor opportunities</li>
+        <li>Direct writer messaging</li>
+        <li>EU AI Act compliance exports</li>
+        <li>API access</li>
+        <li>Dedicated support</li>
+      </ul>
+      <button class="plan-btn">Contact Us</button>
+    </div>
+  </div>
+</section>
+
+<!-- GC-1 -->
+<section class="gc-section">
+  <div class="gc-inner">
+    <div class="gc-visual reveal">
+      <div class="gc-rings">
+        <div class="gc-ring"></div>
+        <div class="gc-ring"></div>
+        <div class="gc-ring"></div>
+        <div class="gc-ring"></div>
+        <div class="gc-core">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M14 2L26 8V20L14 26L2 20V8L14 2Z" stroke="white" stroke-width="1.5"/>
+            <circle cx="14" cy="14" r="4" fill="white" opacity="0.8"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="gc-text reveal">
+      <div class="section-label">The Foundation</div>
+      <h2>Powered by the world's most trusted <em>proof infrastructure.</em></h2>
+      <p>Block Bindery is built on Guardian Chain GC-1 — sovereign truth infrastructure designed for governments, enterprises, and high-stakes environments. The same technology that protects critical decisions now protects your poems.</p>
+      <p>Founded by Troy Anthony Cronin, GC-1 is not just a blockchain. It is sovereign evidence infrastructure — your seal is court-admissible, tamper-proof, and permanent regardless of what happens to any platform or server.</p>
+      <div class="gc-badge">
+        <div class="gc-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1L17 5V13L9 17L1 13V5L9 1Z" stroke="#d4a843" stroke-width="1.2"/><circle cx="9" cy="9" r="2.5" fill="#d4a843" opacity="0.7"/></svg>
+        </div>
+        <div class="gc-words">
+          <div class="label">Verified by</div>
+          <div class="name">Guardian Chain GC-1</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="final-big reveal">Your next word could<br>change <span>everything.</span></div>
+  <div class="final-sub reveal">Make sure the world knows you wrote it first.</div>
+  <div class="final-email reveal">
+    <input class="email-in" type="email" placeholder="your@email.com" />
+    <button class="email-btn" id="final-btn">Join the Bindery</button>
+  </div>
+  <div class="final-note reveal" id="final-note">Free forever plan available · Launching soon · Join <span id="counter">0</span> dreamers on the waitlist</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Block Bindery</div>
+  <div class="footer-tagline">Protecting the worth of your words.</div>
+  <div class="footer-gc">Powered by Guardian Chain GC-1 · Founded by Patrick Van Cronin · © 2026</div>
+</footer>
+
+<script>
+// Cursor
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+});
+document.querySelectorAll('button, a, input').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+});
+
+// Stars
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 120; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random() * 2 + 0.5;
+  s.style.cssText = `
+    width:${size}px; height:${size}px;
+    left:${Math.random()*100}%;
+    top:${Math.random()*100}%;
+    animation-duration:${Math.random()*4+2}s;
+    animation-delay:${Math.random()*4}s;
+  `;
+  starsEl.appendChild(s);
+}
+
+// Floating symbols
+const symbols = ['✦','◆','◇','○','△','☽','✧','⊕','∞','◉','⬡','✺','⋆','❋'];
+const floatsEl = document.getElementById('floats');
+for (let i = 0; i < 20; i++) {
+  const f = document.createElement('div');
+  f.className = 'fsym';
+  f.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+  f.style.cssText = `
+    left:${Math.random()*100}%;
+    animation-duration:${Math.random()*20+15}s;
+    animation-delay:${Math.random()*15}s;
+    font-size:${Math.random()*16+10}px;
+  `;
+  floatsEl.appendChild(f);
+}
+
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.08 });
+reveals.forEach(r => observer.observe(r));
+
+// Counter animation
+let count = 0;
+const target = 312;
+const counterEl = document.getElementById('counter');
+const countUp = () => {
+  if (count < target) {
+    count += Math.ceil((target - count) / 10);
+    if (count > target) count = target;
+    if (counterEl) counterEl.textContent = count;
+    requestAnimationFrame(countUp);
+  }
+};
+setTimeout(countUp, 2000);
+
+// Email buttons
+function handleEmail(btnId, noteId) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    const row = btn.closest('.hero-email, .final-email');
+    const input = row ? row.querySelector('input') : null;
+    if (input && input.value.includes('@')) {
+      btn.textContent = '✦ You\'re In';
+      btn.style.background = '#2a6b3a';
+      input.value = '';
+      input.placeholder = 'Welcome to the Bindery ✦';
+    } else if (input) {
+      input.style.borderColor = 'var(--crimson2)';
+      input.focus();
+      setTimeout(() => input.style.borderColor = '', 1500);
+    }
+  });
+}
+
+handleEmail('hero-btn', 'hero-note');
+handleEmail('final-btn', 'final-note');
+</script>
+</body>
+</html>
